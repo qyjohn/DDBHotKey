@@ -28,7 +28,7 @@ When you enable [DynamoDB Streams](https://docs.aws.amazon.com/amazondynamodb/la
 
 **(2) How to use it?**
 
-We recommend that you run the DDBHotKey utility on an EC2 instance with an IAM role. The IAM role needs to have the permissions to perform dynamodb:DescribeTable, dynamodb:DescribeStream, dynamodb:GetShardIterator, dynamodb:GetRecords on your DynamoDB table. In the following example, we add dynamodb:PutItem to the IAM policy because we want to write test data to the test DynamoDB table. If you are not planning to write to your DynamoDB table from the same EC2 instance, you should remove dynamodb:PutItem from your IAM policy. 
+We recommend that you run the DDBHotKey utility on an EC2 instance with an IAM role. The IAM role needs to have the permissions to perform **dynamodb:DescribeTable**, **dynamodb:DescribeStream**, **dynamodb:GetShardIterator**, **dynamodb:GetRecords** on your DynamoDB table. In the following example, we add **dynamodb:PutItem** to the IAM policy because we want to write test data to the test DynamoDB table. If you are not planning to write to your DynamoDB table from the same EC2 instance, you should remove dynamodb:PutItem from your IAM policy. 
 
 ~~~~
 {
