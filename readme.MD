@@ -1,3 +1,5 @@
+# DynamoDB Hot Key Utility (DDBHotKey)
+
 This project uses the information in DynamoDB Streams to analysis hot key issues with your DynamoDB table when you have a **write-intensive workload**.
 
 The AWS SDK for Java is the only dependency. 
@@ -56,3 +58,44 @@ In a separate SSH window, generate some workload on the test table. The paramete
 cd ~/DDBHotKey
 java -cp target/ddb-hotkey-jar-with-dependencies.jar net.qyjohn.DDBHotKey.TestDDB 20
 ~~~~
+
+Below is the test output with the **topEntry** parameter set to 5:
+
+~~~~
+$ java -cp target/ddb-hotkey-jar-with-dependencies.jar net.qyjohn.DDBHotKey.DDBHotKey 
+log4j:WARN No appenders could be found for logger (com.amazonaws.AmazonWebServiceClient).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+
+shardId-00000001541649352447-f1e80d4a
+	54	{S: 923e4db9-fc24-43b9-a370-6dc329b43965,}
+	52	{S: 8d37de33-daa3-4cb1-92a7-af04ea18d23f,}
+	51	{S: dad8eaa5-c230-44e9-9ca2-8803e772a8c0,}
+	50	{S: 109b40e2-0dd0-4df5-911e-63a0e77e7f9b,}
+	50	{S: 6475e559-1a3b-45e7-ab61-665e593344e1,}
+
+
+shardId-00000001541649352551-411b3cc2
+	56	{S: ac52badf-618c-4c36-a110-2259b5316402,}
+	54	{S: 3ca8b94c-e64a-47ae-99f9-bd8cba14ecd9,}
+	52	{S: 5516a95c-415d-4805-b388-4ef0abbf1604,}
+	50	{S: 650ef422-1fdf-48c9-be60-5c0a4de79e3a,}
+	50	{S: cf716a9e-e582-4c9a-b8e3-49b49e5f2f34,}
+
+
+shardId-00000001541649352447-f1e80d4a
+	195	{S: 3d3095aa-dc8c-4b5e-b703-162c7c49a2a3,}
+	191	{S: 8d37de33-daa3-4cb1-92a7-af04ea18d23f,}
+	187	{S: 923e4db9-fc24-43b9-a370-6dc329b43965,}
+	185	{S: 05648d36-3da8-410f-983d-5e203792dac5,}
+	184	{S: dad8eaa5-c230-44e9-9ca2-8803e772a8c0,}
+
+
+shardId-00000001541649352551-411b3cc2
+	193	{S: f9ee9e0e-40a8-457c-a439-773dd6d8a4f0,}
+	193	{S: 23761174-f690-4f9a-8f9f-9aa00e0ef445,}
+	192	{S: 026cda55-f7eb-4dad-814b-e265bdd2e777,}
+	192	{S: f039ff6e-e0c9-4b12-aba6-aa5190cf60fc,}
+	189	{S: ac52badf-618c-4c36-a110-2259b5316402,}
+~~~~
+
