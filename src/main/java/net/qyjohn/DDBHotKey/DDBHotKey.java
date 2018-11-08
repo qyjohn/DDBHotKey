@@ -135,8 +135,10 @@ public class DDBHotKey
 		try
 		{
 			DescribeTableResult tblResult = ddbClient.describeTable(tableName);
-			StreamSpecification stream = tblResult.getTable().getStreamSpecification();
-			if (stream.isStreamEnabled())
+			streamArn = tblResult.getTable().getLatestStreamArn();
+			//StreamSpecification stream = tblResult.getTable().getStreamSpecification();
+			//if (stream.isStreamEnabled())
+			if (streamArn != null)
 			{
 				streamArn = tblResult.getTable().getLatestStreamArn();
 				DescribeStreamResult result = strClient.describeStream(
@@ -151,7 +153,7 @@ public class DDBHotKey
 			}
 			else
 			{
-				System.out.println("Stream is not enabled for table: " + tableName);
+				System.out.println("\n\n DynamoDB Stream is not enabled for table: " + tableName + "\n\n");
 			}
 		}catch (Exception e)
 		{

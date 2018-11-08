@@ -1,4 +1,4 @@
-This project uses the information in the DynamoDB Streams to analysis hot key issues with your DynamoDB table.
+This project uses the information in DynamoDB Streams to analysis hot key issues with your DynamoDB table when you have a **write-intensive workload**.
 
 The AWS SDK for Java is the only dependency. 
 
@@ -13,3 +13,11 @@ hashKey=hash
 interval=10
 topEntry=10
 ~~~~
+
+**(1) How does it work?**
+
+
+
+**(2) How to use it?**
+
+
