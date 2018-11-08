@@ -26,4 +26,33 @@ When you enable [DynamoDB Streams](https://docs.aws.amazon.com/amazondynamodb/la
 
 **(2) How to use it?**
 
+We recommend that you run the DDBHotKey utility on an EC2 instance with an IAM role. The IAM role needs to have the permissions to the access your DynamoDB table. In the easier case, you might just want dynamodb:* for quick testing.
 
+Below are the steps to run the DDBHotKey utility on Ubuntu 16.04 / 18.04:
+
+First of all, you need the JDK 1.8+, Maven, and git:
+
+~~~~
+cd ~
+sudo apt update
+sudo apt install openjdk-8-jdk maven git
+git clone https://github.com/qyjohn/DDBHotKey
+cd DDBHotKey
+mvn package
+~~~~
+
+Now create a test table "hotkey" with a hash key (hash, String) and range key (sort, String) in DynamoDB. To make sure that you have more than 1 partitions in the test table, do not accept the default capacity settings, but rather manually assign 1500 WCU to the test table. Also, make sure that you enable DynamoDB Streams for the test table.
+
+Modify **ddb.properties** with the correct AWS region and table name. Then start the DDBHotKey utility using the following command.
+
+~~~~
+cd ~/DDBHotKey
+java -cp target/ddb-hotkey-jar-with-dependencies.jar net.qyjohn.DDBHotKey.DDBHotKey 
+~~~~
+
+In a separate SSH window, generate some workload on the test table. The parameter 20 specified means 20 different hash keys will be used in the test. You can change this to something else like 100 or 200. Please note that setting a large number will consume more WCU from your table. 
+
+~~~~
+cd ~/DDBHotKey
+java -cp target/ddb-hotkey-jar-with-dependencies.jar net.qyjohn.DDBHotKey.TestDDB 20
+~~~~
