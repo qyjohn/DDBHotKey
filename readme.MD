@@ -59,7 +59,7 @@ cd ~/DDBHotKey
 java -cp target/ddb-hotkey-jar-with-dependencies.jar net.qyjohn.DDBHotKey.TestDDB 20
 ~~~~
 
-Below is the test output with the **topEntry** parameter set to 5:
+Below is the test output with the **topEntry** parameter set to 5. In the output you first see the shard id, then the number of requests for the top N hash keys in each shard, in descending order.
 
 ~~~~
 $ java -cp target/ddb-hotkey-jar-with-dependencies.jar net.qyjohn.DDBHotKey.DDBHotKey 
