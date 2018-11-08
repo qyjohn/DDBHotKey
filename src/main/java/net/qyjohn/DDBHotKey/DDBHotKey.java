@@ -15,9 +15,9 @@ class ShardReader extends Thread
 {
         AmazonDynamoDBStreamsClient client;
 	String streamArn, shardId, hashKey, region;
-	int interval;
+	int interval, topEntry;
 
-	public ShardReader(String streamArn, String shardId, String hashKey, String region, int interval)
+	public ShardReader(String streamArn, String shardId, String hashKey, String region, int interval, int topEntry)
 	{
                 client = new AmazonDynamoDBStreamsClient();
                 client.configureRegion(Regions.fromName(region));
@@ -25,6 +25,7 @@ class ShardReader extends Thread
 		this.shardId   = shardId;
 		this.hashKey   = hashKey;
 		this.interval  = interval;
+		this.topEntry  = topEntry;
 	}
 
 	public void run()
@@ -78,10 +79,13 @@ class ShardReader extends Thread
 					
 					String output = "\n" + shardId;
 					Iterator it = sortedMap.entrySet().iterator();
-					while (it.hasNext()) 
+
+					int count = 0;
+					while (it.hasNext() && (count < topEntry)) 
 					{
 						Map.Entry pair = (Map.Entry)it.next();
 						output = output + "\n\t" + pair.getValue() + "\t" + pair.getKey();
+						count++;
 					}
 					output = output + "\n";
 					System.out.println(output);
@@ -100,7 +104,7 @@ public class DDBHotKey
 	public AmazonDynamoDBClient        ddbClient;
         public AmazonDynamoDBStreamsClient strClient;
 	public String tableName, streamArn, hashKey, region;
-	public int interval;
+	public int interval, topEntry;
 
         public DDBHotKey()
         {
@@ -113,6 +117,7 @@ public class DDBHotKey
 			tableName = prop.getProperty("tableName");
 			hashKey   = prop.getProperty("hashKey");
 			interval  = Integer.parseInt(prop.getProperty("interval"));
+			topEntry  = Integer.parseInt(prop.getProperty("topEntry"));
 
 			ddbClient = new AmazonDynamoDBClient();
 			ddbClient.configureRegion(Regions.fromName(region));
@@ -141,7 +146,7 @@ public class DDBHotKey
 				for (Shard shard : shards)
 				{
 					String shardId = shard.getShardId();
-					new ShardReader(streamArn, shardId, hashKey, region, interval).start();
+					new ShardReader(streamArn, shardId, hashKey, region, interval, topEntry).start();
 				}
 			}
 			else
