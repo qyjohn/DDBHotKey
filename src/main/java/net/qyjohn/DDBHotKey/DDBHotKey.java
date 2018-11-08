@@ -49,7 +49,7 @@ class ShardReader extends Thread
 					List<Record> records = result2.getRecords();
 					if (records.isEmpty())
 					{
-						sleep(1000);	// No records
+						sleep(1000);	// No records, sleep 1 second
 					}
 					else
 					{
@@ -64,8 +64,6 @@ class ShardReader extends Thread
 							{
 								map.put(key, new Integer(1));
 							}
-//							String data = key.toString();
-//							System.out.println(shardId + "\t" + data);
 						}
 					}
 				}
