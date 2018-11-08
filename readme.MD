@@ -130,4 +130,6 @@ shardId-00000001541649352551-411b3cc2
 
 DynamoDB Streams only capture write activities in your DynamoDB table. As such, the DDBHotKey utility can not be used to analyze read-intensive workload. 
 
+Since we use a dedicate thread to handle the activities in each shard (DynamoDB partition), the computing cost is proportional to (a) the number of shards in the stream, and (b) the level of activities in each shard. In our tests on AWS EC2, a single vCPU can easily handle 2~4 threads easily. For example, if you have 16 shards in the stream, an EC2 instance with 4 vCPU cores should be able to handle the workload gracefully. If you have an EC2 instance with 32 vCPU cores, you can probably handle around 4 x 32 = 128 shards. 
 
+Memory consumption is proportion to the amount of write activities during one sampling cycle. Think about you have a DynamoDB table with 100,000 WCU and you are fully utilizing all of it, you are able to write to your table with a 100,000 x 1 KB = 100 MB/s throughput at maximum. If you set the sampling period (**interval**) to 10 seconds, then you will need 10 x 100 = 1000 MB memory to store the data retrieved from the stream. In order to perform the statistics on the data, we need approximately 4 times the memory, which is around 4000 MB. An EC2 instance with 32 vCPU cores would have over 60 GB memory, which is more than sufficient.
