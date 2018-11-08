@@ -72,17 +72,19 @@ class ShardReader extends Thread
 				{
 					Map<AttributeValue, Integer> sortedMap = 
 						map.entrySet().stream()
-						.sorted(Map.Entry.comparingByValue())
+						.sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
 						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
 						(e1, e2) -> e1, LinkedHashMap::new));
-
-					System.out.println("\n" + shardId);
+					
+					String output = "\n" + shardId;
 					Iterator it = sortedMap.entrySet().iterator();
 					while (it.hasNext()) 
 					{
 						Map.Entry pair = (Map.Entry)it.next();
-						System.out.println("\t" + pair.getValue() + "\t" + pair.getKey());
+						output = output + "\n\t" + pair.getValue() + "\t" + pair.getKey();
 					}
+					output = output + "\n";
+					System.out.println(output);
 				}
 			}
 		}catch (Exception e)
