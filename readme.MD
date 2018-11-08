@@ -2,7 +2,7 @@
 
 This project uses the information in DynamoDB Streams to analyze hot key issues with your DynamoDB table when you have a **write-intensive workload**.
 
-The AWS SDK for Java is the only dependency. 
+The AWS SDK for Java is the only software dependency. There is no other AWS service involved apart from DynamoDB Streams. You do not need to modify/interupt your existing DynamoDB application to use the this utility. The utility performs the said analysis in a non-intrusive way, with near real time response time. 
 
 Modify **ddb.properties** with the necessary information. Attribute **region** is the AWS region in which you have your DynamoDB table, **tableName** is the name of your DynamoDB table, **hashKey** is the name of the hash key of your DynamoDB table, **interval** is the sampling period in seconds (setting it to less than 5 seconds is not recommended), **topEntry** is the number of hot keys you want to display in each partition.
 
@@ -28,7 +28,7 @@ When you enable [DynamoDB Streams](https://docs.aws.amazon.com/amazondynamodb/la
 
 **(2) How to use it?**
 
-We recommend that you run the DDBHotKey utility on an EC2 instance with an IAM role. The IAM role needs to have the permissions to perform **dynamodb:DescribeTable**, **dynamodb:DescribeStream**, **dynamodb:GetShardIterator**, **dynamodb:GetRecords** on your DynamoDB table. In the following example, we add **dynamodb:PutItem** to the IAM policy because we want to write test data to the test DynamoDB table. If you are not planning to write to your DynamoDB table from the same EC2 instance, you should remove dynamodb:PutItem from your IAM policy. 
+We recommend that you run the DDBHotKey utility on an EC2 instance with an IAM role. The IAM role needs to have the permissions to perform **dynamodb:DescribeTable**, **dynamodb:DescribeStream**, **dynamodb:GetShardIterator**, **dynamodb:GetRecords** on your DynamoDB table. In the following example, we add **dynamodb:PutItem** to the IAM policy because we want to write test data to the test DynamoDB table. If you are not planning to write to your DynamoDB table from the same EC2 instance, you should remove **dynamodb:PutItem** from your IAM policy. 
 
 ~~~~
 {
