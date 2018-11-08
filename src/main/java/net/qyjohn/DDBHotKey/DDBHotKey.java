@@ -2,6 +2,7 @@ package net.qyjohn.DDBHotKey;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.*;
 import java.nio.charset.Charset;
 import com.amazonaws.*;
 import com.amazonaws.auth.*;
@@ -13,14 +14,17 @@ import com.amazonaws.services.dynamodbv2.model.*;
 class ShardReader extends Thread
 {
         AmazonDynamoDBStreamsClient client;
-	String streamArn, shardId, region;
+	String streamArn, shardId, hashKey, region;
+	int interval;
 
-	public ShardReader(String streamArn, String shardId, String region)
+	public ShardReader(String streamArn, String shardId, String hashKey, String region, int interval)
 	{
                 client = new AmazonDynamoDBStreamsClient();
                 client.configureRegion(Regions.fromName(region));
 		this.streamArn = streamArn;
-		this.shardId = shardId;
+		this.shardId   = shardId;
+		this.hashKey   = hashKey;
+		this.interval  = interval;
 	}
 
 	public void run()
@@ -31,31 +35,55 @@ class ShardReader extends Thread
 				new GetShardIteratorRequest()
 				.withStreamArn(streamArn)
 				.withShardId(shardId)
-				.withShardIteratorType(ShardIteratorType.TRIM_HORIZON));
+				.withShardIteratorType(ShardIteratorType.LATEST));
 			String shardIterator = result1.getShardIterator();
 
-			boolean hasData = true;
-			while (hasData)
+			while (true)
 			{
-				GetRecordsResult result2 = client.getRecords(new GetRecordsRequest().withShardIterator(shardIterator));	
-				shardIterator = result2.getNextShardIterator();
-				if (shardIterator == null)
+				long endTime = System.currentTimeMillis() + 1000*interval;
+				HashMap<AttributeValue, Integer> map = new HashMap<AttributeValue, Integer>();
+				while (System.currentTimeMillis() < endTime)
 				{
-					hasData = false; // Shard closed.
+					GetRecordsResult result2 = client.getRecords(new GetRecordsRequest().withShardIterator(shardIterator));	
+					shardIterator = result2.getNextShardIterator();
+					List<Record> records = result2.getRecords();
+					if (records.isEmpty())
+					{
+						sleep(1000);	// No records
+					}
+					else
+					{
+						for (Record record : records)
+						{
+							AttributeValue key = record.getDynamodb().getKeys().get(hashKey);
+							if (map.containsKey(key))
+							{
+								map.put(key, new Integer(map.get(key).intValue() + 1));
+							}
+							else
+							{
+								map.put(key, new Integer(1));
+							}
+//							String data = key.toString();
+//							System.out.println(shardId + "\t" + data);
+						}
+					}
 				}
 
-				List<Record> records = result2.getRecords();
-				if (records.isEmpty())
+				if (!map.isEmpty())
 				{
-					sleep(2000);	// No records
-				}
-				else
-				{
-					for (Record record : records)
+					Map<AttributeValue, Integer> sortedMap = 
+						map.entrySet().stream()
+						.sorted(Map.Entry.comparingByValue())
+						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+						(e1, e2) -> e1, LinkedHashMap::new));
+
+					System.out.println("\n" + shardId);
+					Iterator it = sortedMap.entrySet().iterator();
+					while (it.hasNext()) 
 					{
-						StreamRecord sRecord = record.getDynamodb();
-						String data = sRecord.toString();
-						System.out.println(shardId + "\t" + data);
+						Map.Entry pair = (Map.Entry)it.next();
+						System.out.println("\t" + pair.getValue() + "\t" + pair.getKey());
 					}
 				}
 			}
@@ -71,7 +99,8 @@ public class DDBHotKey
 {
 	public AmazonDynamoDBClient        ddbClient;
         public AmazonDynamoDBStreamsClient strClient;
-	public String tableName, streamArn, region;
+	public String tableName, streamArn, hashKey, region;
+	public int interval;
 
         public DDBHotKey()
         {
@@ -82,6 +111,8 @@ public class DDBHotKey
 			prop.load(input);
 			region    = prop.getProperty("region");
 			tableName = prop.getProperty("tableName");
+			hashKey   = prop.getProperty("hashKey");
+			interval  = Integer.parseInt(prop.getProperty("interval"));
 
 			ddbClient = new AmazonDynamoDBClient();
 			ddbClient.configureRegion(Regions.fromName(region));
@@ -110,7 +141,7 @@ public class DDBHotKey
 				for (Shard shard : shards)
 				{
 					String shardId = shard.getShardId();
-					new ShardReader(streamArn, shardId, region).start();
+					new ShardReader(streamArn, shardId, hashKey, region, interval).start();
 				}
 			}
 			else
