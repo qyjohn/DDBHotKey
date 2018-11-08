@@ -1,6 +1,6 @@
 # DynamoDB Hot Key Utility (DDBHotKey)
 
-This project uses the information in DynamoDB Streams to analysis hot key issues with your DynamoDB table when you have a **write-intensive workload**.
+This project uses the information in DynamoDB Streams to analyze hot key issues with your DynamoDB table when you have a **write-intensive workload**.
 
 The AWS SDK for Java is the only dependency. 
 
