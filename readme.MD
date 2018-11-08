@@ -99,3 +99,8 @@ shardId-00000001541649352551-411b3cc2
 	189	{S: ac52badf-618c-4c36-a110-2259b5316402,}
 ~~~~
 
+**(3) Others**
+
+DynamoDB Streams only capture write activities in your DynamoDB table. As such, the DDBHotKey utility can not be used to analyze read-intensive workload. 
+
+
