@@ -38,8 +38,8 @@ We recommend that you run the DDBHotKey utility on an EC2 instance with an IAM r
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
-                "dynamodb:GetShardIterator",
                 "dynamodb:DescribeStream",
+                "dynamodb:GetShardIterator",
                 "dynamodb:GetRecords"
             ],
             "Resource": "*"
