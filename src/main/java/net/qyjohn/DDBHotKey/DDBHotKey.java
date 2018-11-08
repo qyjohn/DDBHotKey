@@ -136,8 +136,6 @@ public class DDBHotKey
 		{
 			DescribeTableResult tblResult = ddbClient.describeTable(tableName);
 			streamArn = tblResult.getTable().getLatestStreamArn();
-			//StreamSpecification stream = tblResult.getTable().getStreamSpecification();
-			//if (stream.isStreamEnabled())
 			if (streamArn != null)
 			{
 				streamArn = tblResult.getTable().getLatestStreamArn();
