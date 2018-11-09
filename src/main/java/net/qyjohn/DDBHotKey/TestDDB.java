@@ -58,6 +58,7 @@ public class TestDDB extends Thread
 		int start = 10000000;
 		String hash = UUID.randomUUID().toString();
 		Random random = new Random();
+		int max = random.nextInt(100) + random.nextInt(100);
 		while (true)
 		{
 			try 
@@ -65,7 +66,7 @@ public class TestDDB extends Thread
 				String sort = UUID.randomUUID().toString();
 				String value = hash + "-" + sort;
 				put(hash, sort, value);
-				sleep(random.nextInt(100));
+				sleep(random.nextInt(max));
 			} catch (Exception e) 
 			{
 				System.out.println(e.getMessage());
