@@ -43,6 +43,7 @@ class ShardReader extends Thread
 			{
 				long endTime = System.currentTimeMillis() + 1000*interval;
 				HashMap<AttributeValue, Integer> map = new HashMap<AttributeValue, Integer>();
+				int total = 0;
 				while (System.currentTimeMillis() < endTime)
 				{
 					GetRecordsResult result2 = client.getRecords(new GetRecordsRequest().withShardIterator(shardIterator));	
@@ -56,6 +57,7 @@ class ShardReader extends Thread
 					{
 						for (Record record : records)
 						{
+							total++;
 							AttributeValue key = record.getDynamodb().getKeys().get(hashKey);
 							if (map.containsKey(key))
 							{
@@ -77,14 +79,15 @@ class ShardReader extends Thread
 						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
 						(e1, e2) -> e1, LinkedHashMap::new));
 					
-					String output = "\n" + shardId;
+					String output = "\n" + shardId + " Total: " + total;
 					Iterator it = sortedMap.entrySet().iterator();
 
 					int count = 0;
 					while (it.hasNext() && (count < topEntry)) 
 					{
-						Map.Entry pair = (Map.Entry)it.next();
-						output = output + "\n\t" + pair.getValue() + "\t" + pair.getKey();
+						Map.Entry<AttributeValue, Integer> pair = (Map.Entry)it.next();
+						String percent = String.format("%.1f", 100 * ((float) pair.getValue().intValue() / (float) total));
+						output = output + "\n\t" + pair.getValue() + "\t" + percent + " %\t" + pair.getKey();
 						count++;
 					}
 					output = output + "\n";
