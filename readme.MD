@@ -85,7 +85,7 @@ java -cp target/ddb-hotkey-jar-with-dependencies.jar net.qyjohn.DDBHotKey.DDBHot
 **(3) Does it really work?**
 
 
-In a separate SSH window, generate some workload on the test table you just create. In the following example, the specified command line argument 20 means 20 different hash keys will be used in the test. You can change this to something else like 100 or 200. Please note that setting a large number will consume more WCU from your table (each hash key will consume approximately 20 WCU). 
+In a separate SSH window, generate some workload on the test table you just create. In the following example, the specified command line argument 20 means 20 different hash keys will be used in the test. You can change this to something else like 100 or 200. Please note that setting a large number will consume more WCU from your table (each hash key will consume approximately 20~50 WCU). 
 
 ~~~~
 cd ~/DDBHotKey
