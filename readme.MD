@@ -4,17 +4,6 @@ This project uses the information in DynamoDB Streams to analyze hot key issues 
 
 The AWS SDK for Java is the only software dependency. There is no other AWS service involved apart from DynamoDB Streams. You do not need to modify/interupt your existing DynamoDB application to use the this utility. The utility performs the said analysis in a non-intrusive way, with near real time response time. 
 
-Modify **ddb.properties** with the necessary information. Attribute **region** is the AWS region in which you have your DynamoDB table, **tableName** is the name of your DynamoDB table, **hashKey** is the name of the hash key of your DynamoDB table, **interval** is the sampling period in seconds (setting it to less than 5 seconds is not recommended), **topEntry** is the number of hot keys you want to display in each partition.
-
-Below is an example of **ddb.properties**:
-
-~~~~
-region=ap-southeast-2
-tableName=hotkey
-hashKey=hash
-interval=10
-topEntry=10
-~~~~
 
 **(1) How does it work?**
 
@@ -57,9 +46,7 @@ We recommend that you run the DDBHotKey utility on an EC2 instance with an IAM r
 }
 ~~~~
 
-Below are the steps to run the DDBHotKey utility on Ubuntu 16.04 / 18.04:
-
-First of all, you need the JDK 1.8+, Maven, and git:
+Below are the steps to run the DDBHotKey utility on Ubuntu 16.04 / 18.04. Basically, you just need JDK 1.8+, Maven, and git to download and build the project:
 
 ~~~~
 cd ~
@@ -70,9 +57,21 @@ cd DDBHotKey
 mvn package
 ~~~~
 
-Now create a test table "hotkey" with a hash key (hash, String) and range key (sort, String) in DynamoDB. To make sure that you have more than 1 partitions in the test table, do not accept the default capacity settings, but rather manually assign 1500 WCU to the test table. Also, make sure that you enable DynamoDB Streams for the test table.
+Now create a test DynamoDB table "hotkey" with a hash key (hash, String) and range key (sort, String) in DynamoDB. To make sure that you have more than 1 partitions in the test table, do not accept the default capacity settings, but rather manually assign 1500 WCU to the test table. Also, make sure that you enable DynamoDB Streams for the test table.
 
-Modify **ddb.properties** with the correct AWS region and table name. Then start the DDBHotKey utility using the following command.
+Modify **ddb.properties** with the necessary information. Attribute **region** is the AWS region in which you have your DynamoDB table, **tableName** is the name of your DynamoDB table, **hashKey** is the name of the hash key of your DynamoDB table, **interval** is the sampling period in seconds (setting it to less than 5 seconds is not recommended), **topEntry** is the number of hot keys you want to display in each partition.
+
+Below is an example of **ddb.properties**:
+
+~~~~
+region=ap-southeast-2
+tableName=hotkey
+hashKey=hash
+interval=10
+topEntry=10
+~~~~
+
+Then start the DDBHotKey utility using the following command.
 
 ~~~~
 cd ~/DDBHotKey
