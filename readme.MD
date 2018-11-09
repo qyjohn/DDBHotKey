@@ -7,6 +7,7 @@ The AWS SDK for Java is the only software dependency. There is no other AWS serv
 
 **(1) How does it work?**
 
+
 When you enable [DynamoDB Streams](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html) for your DynamoDB table, DynamoDB Streams writes a record with the primary key attribute(s) of the items that are modified in near real time. The DDBHotKey utility reads from the stream and performs simple statistics, as below:
 
 - For each partition in the DynamoDB table, there is a corresponding shard in the stream. 
@@ -15,7 +16,9 @@ When you enable [DynamoDB Streams](https://docs.aws.amazon.com/amazondynamodb/la
 
 - For each sampling interval (defined by the **interval** parameter), the DDBHotKey utility prints out the top N (defined by the **topEntry** parameter) hot keys in each partition (shard). If there is no write activity in a partition, then there is no data in the corresponding shard. 
 
+
 **(2) How to use it?**
+
 
 We recommend that you run the DDBHotKey utility on an EC2 instance with an IAM role. The IAM role needs to have the permissions to perform **dynamodb:DescribeTable**, **dynamodb:DescribeStream**, **dynamodb:GetShardIterator**, **dynamodb:GetRecords** on your DynamoDB table. In the following example, we add **dynamodb:PutItem** to the IAM policy because we want to write test data to the test DynamoDB table. If you are not planning to write to your DynamoDB table from the same EC2 instance, you should remove **dynamodb:PutItem** from your IAM policy. 
 
@@ -71,14 +74,18 @@ interval=10
 topEntry=10
 ~~~~
 
-Then start the DDBHotKey utility using the following command.
+Then start the DDBHotKey utility using the following command. That's it. That's all you need.
 
 ~~~~
 cd ~/DDBHotKey
 java -cp target/ddb-hotkey-jar-with-dependencies.jar net.qyjohn.DDBHotKey.DDBHotKey 
 ~~~~
 
-In a separate SSH window, generate some workload on the test table. The parameter 20 specified means 20 different hash keys will be used in the test. You can change this to something else like 100 or 200. Please note that setting a large number will consume more WCU from your table. 
+
+**(3) Does it really work?**
+
+
+In a separate SSH window, generate some workload on the test table you just create. In the following example, the specified command line argument 20 means 20 different hash keys will be used in the test. You can change this to something else like 100 or 200. Please note that setting a large number will consume more WCU from your table (each hash key will consume approximately 20 WCU). 
 
 ~~~~
 cd ~/DDBHotKey
@@ -125,7 +132,7 @@ shardId-00000001541748842182-d55ec92e Total: 2614
 	247	9.4 %	{S: ba05c4d2-d2ff-4584-b18e-e331ec6d29b6,}
 ~~~~
 
-**(3) Others**
+**(4) Other Considerations**
 
 DynamoDB Streams only capture write activities in your DynamoDB table. As such, the DDBHotKey utility can not be used to analyze read-intensive workload. 
 
