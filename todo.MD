@@ -1,3 +1,5 @@
-TODO LIST
+#TODO LIST
 
-(1) Add support for GSI hotkey detection
+- Add support for GSI hotkey detection
+
+- Add comments into source code.
