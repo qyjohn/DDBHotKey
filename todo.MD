@@ -1,4 +1,4 @@
-#TODO LIST
+# TODO LIST
 
 - Add support for GSI hotkey detection
 
