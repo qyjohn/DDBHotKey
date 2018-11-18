@@ -27,21 +27,14 @@ We recommend that you run the DDBHotKey utility on an EC2 instance with an IAM r
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "VisualEditor0",
+            "Sid": "DDBHotKey",
             "Effect": "Allow",
             "Action": [
                 "dynamodb:DescribeStream",
+                "dynamodb:DescribeTable",
                 "dynamodb:GetShardIterator",
-                "dynamodb:GetRecords"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Sid": "VisualEditor1",
-            "Effect": "Allow",
-            "Action": [
-                "dynamodb:PutItem",
-                "dynamodb:DescribeTable"
+                "dynamodb:GetRecords",
+                "dynamodb:PutItem"
             ],
             "Resource": "*"
         }
