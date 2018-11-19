@@ -17,6 +17,12 @@ class ShardReader extends Thread
 	String streamArn, shardId, hashKey, region;
 	int interval, topEntry;
 
+	/**
+	 *
+	 * Constructor. Each instance of the ShardReader is responsible for handling the data from one shard. 
+	 *
+	 */
+
 	public ShardReader(String streamArn, String shardId, String hashKey, String region, int interval, int topEntry)
 	{
                 client = new AmazonDynamoDBStreamsClient();
@@ -27,6 +33,12 @@ class ShardReader extends Thread
 		this.interval  = interval;
 		this.topEntry  = topEntry;
 	}
+
+	/**
+	 *
+	 * The run() method performs the actual data collection and data analysis work. 
+	 *
+	 */
 
 	public void run()
 	{
@@ -44,6 +56,8 @@ class ShardReader extends Thread
 				long endTime = System.currentTimeMillis() + 1000*interval;
 				HashMap<AttributeValue, Integer> map = new HashMap<AttributeValue, Integer>();
 				int total = 0;
+
+				// Here we start a new sampling cycle. Start collecting data until the end of the sampling cycle. 
 				while (System.currentTimeMillis() < endTime)
 				{
 					GetRecordsResult result2 = client.getRecords(new GetRecordsRequest().withShardIterator(shardIterator));	
@@ -57,8 +71,13 @@ class ShardReader extends Thread
 					{
 						for (Record record : records)
 						{
-							total++;
-							AttributeValue key = record.getDynamodb().getKeys().get(hashKey);
+							// Try to get the New Image first. If New Image is not available, get the Keys
+							AttributeValue key;
+							key = record.getDynamodb().getNewImage().get(hashKey);
+							if (key == null)
+							{
+								key = record.getDynamodb().getKeys().get(hashKey);
+							}
 							if (map.containsKey(key))
 							{
 								map.put(key, new Integer(map.get(key).intValue() + 1));
@@ -67,10 +86,13 @@ class ShardReader extends Thread
 							{
 								map.put(key, new Integer(1));
 							}
+							// Count the total number of write requests in the sampling period
+							total++;
 						}
 					}
 				}
 
+				// Performing statistics.
 				if (!map.isEmpty())
 				{
 					Map<AttributeValue, Integer> sortedMap = 
@@ -109,6 +131,13 @@ public class DDBHotKey
 	public String tableName, streamArn, hashKey, region;
 	public int interval, topEntry;
 
+	/**
+	 *
+	 * Constructor. Loads configuration from ddb.properties. Also create the 
+	 * AmazonDynamoDBClient and AmazonDynamoDBStreamsClient.
+	 *
+	 */
+
         public DDBHotKey()
         {
 		try
@@ -132,6 +161,14 @@ public class DDBHotKey
 			e.printStackTrace();
 		}
         }
+
+	/**
+	 *
+	 * The run() method checks if the DynamoDB table has enabled streams. If yes, 
+	 * get teh number of shards in the Stream. For each shard, create an instance of 
+	 * ShardReader to handle the incoming data. 
+	 *
+	 */
 
 	public void run()
 	{
@@ -162,6 +199,12 @@ public class DDBHotKey
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 *
+	 * Test method.
+	 *
+	 */
 
         public static void main(String[] args)
         {
